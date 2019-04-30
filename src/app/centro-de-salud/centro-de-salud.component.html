@@ -1,0 +1,248 @@
+<!-- {{centrosDeSaludAll | json}} -->
+
+
+<mat-toolbar color="primary">
+  <i class="material-icons" (click)="sidenav.toggle()" style="cursor: pointer; ">
+    menu
+  </i>
+
+
+  <!-- This fills the remaining space of the current row -->
+  <!-- <span class="example-fill-remaining-space"></span> -->
+
+  <img alt="Centros de Salud" height="45" src="./assets/img/map-white.png" title="Home" width="auto" class="ng-star-inserted"
+    style="margin-left: 2%;">
+  <span id="title">{{' Centros de Salud' | titlecase | uppercase}}</span>
+
+  <!-- This fills the remaining space of the current row -->
+  <span class="example-fill-remaining-space"></span>
+
+  <img alt="Gob" height="45" src="./assets/img/gobierno.png" title="Home" width="auto" class="ng-star-inserted">
+  <img alt="Salud" height="45" src="./assets/img/salud1.png" title="Home" width="auto" class="ng-star-inserted">
+</mat-toolbar>
+
+
+
+
+<mat-drawer-container class="example-container">
+
+  <!-- Side content -->
+  <mat-drawer #sidenav mode="side" [opened]="isVisibleSideBar">
+
+    <mat-card id="optionsCard">
+      <mat-card-title>
+        <div>
+          <img alt="Home" height="25" src="./assets/img/option1.png" title="Home" width="auto" class="ng-star-inserted">
+          <span id="title" style="vertical-align: top;">Opciones</span>
+        </div>
+      </mat-card-title>
+
+      <mat-card-content>
+        <section class="example-section">
+          <mat-checkbox [(ngModel)]="showLabel">Mostrar Nombres</mat-checkbox>
+        </section>
+
+        <!-- <section class="example-section">
+          <mat-checkbox [(ngModel)]="showHighlight" (change)="getKml(selectedDeptoKML)">Mostrar Sombreado</mat-checkbox>
+        </section> -->
+
+        <!-- Check "Tiene Internet" -->
+        <div style="margin-bottom: 4px; margin-top: 10px">Mostrar Sombreado: </div>
+        <mat-button-toggle-group name="MostrarSombreado" [(value)]="selectedMostrarSombreado" (change)="getKml(selectedDeptoKML)"
+          style="margin-bottom: 15px;">
+          <mat-button-toggle value="noMostrar">Ninguno</mat-button-toggle>
+          <mat-button-toggle value="depto">Depto</mat-button-toggle>
+          <mat-button-toggle value="areaProg">Area Prog</mat-button-toggle>
+        </mat-button-toggle-group>
+
+      </mat-card-content>
+    </mat-card>
+
+
+
+    <mat-card id="filtersCard">
+      <mat-card-title>
+        <div>
+          <img alt="Home" height="25" src="./assets/img/filter.png" title="Home" width="auto" class="ng-star-inserted">
+          <span id="title" style="vertical-align: top;">Filtros</span>
+        </div>
+      </mat-card-title>
+
+      <mat-card-content>
+        <div class="example-container">
+
+
+
+          <!-- Input "Buscar por Nombre" -->
+          <mat-form-field>
+            <input matInput placeholder="Buscar por Nombre" [(ngModel)]="textBusqueda" (keyup)="selectionChange()">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <!-- Check "Tiene Internet" -->
+          <div style="margin-bottom: 4px;"><b>Conexion a Internet:</b> </div>
+          <mat-button-toggle-group name="TieneConexion" [(value)]="selectedTieneConexion" (change)="selectionChange()" style="margin-bottom: 15px;">
+            <mat-button-toggle value="todos">Todos</mat-button-toggle>
+            <mat-button-toggle value="tiene">Tiene</mat-button-toggle>
+            <mat-button-toggle value="noTiene">No Tiene</mat-button-toggle>
+          </mat-button-toggle-group>
+
+          <!-- Tiene Conexion Seleccionada: <b>{{selectedTieneConexion}}</b>
+
+
+          <section class="example-section" style="margin-bottom: 8px;">
+            <mat-checkbox [(ngModel)]="tieneInternet" (change)="selectionChange()">Tiene Internet</mat-checkbox>
+          </section> -->
+
+          <!-- Select "Zona"  //[(value)]="selectedZona" (change)="selectionChange()"-->
+          <mat-form-field>
+            <mat-select placeholder="Zonas" [(value)]="selectedZona" (change)="selectionChange()">
+              <mat-option value="0" (click)="getKml(null)">TODAS</mat-option>
+              <mat-option value="1" (click)="getKml(null)">Zona 1</mat-option>
+              <mat-option value="2" (click)="getKml(null)">Zona 2</mat-option>
+              <mat-option value="3" (click)="getKml(null)">Zona 3</mat-option>
+              <mat-option value="4" (click)="getKml(null)">Zona 4</mat-option>
+              <mat-option value="5" (click)="getKml(null)">Zona 5</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- <p>Zona Seleccionada:
+            <b>{{selectedZona}}</b>
+          </p> -->
+
+          <!-- Select "Departamentos" -->
+          <mat-form-field>
+            <mat-select placeholder="Departamentos" [(value)]="selectedDepto" (change)="selectionChange()">
+              <mat-option value="0" (click)="getKml(null)">TODOS</mat-option>
+              <mat-option value="{{dep.ID}}" *ngFor="let dep of departamentosForView" (click)="getKml(dep)">{{dep.Nombre}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Select "Nivel de Atencion" -->
+          <mat-form-field>
+            <mat-select placeholder="Nivel de Atencion" [(value)]="selectedNivel" (change)="selectionChange()">
+              <mat-option value="0">TODOS</mat-option>
+              <mat-option value="{{nivel.ID}}" *ngFor="let nivel of niveles">{{nivel.Descripcion}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Select "Tipo de Establecimiento" -->
+          <mat-form-field>
+            <mat-select placeholder="Tipo de Establecimiento" [(value)]="selectedTipo" (change)="selectionChange()">
+              <mat-option value="0">TODOS</mat-option>
+              <mat-option value="{{tipo.ID}}" *ngFor="let tipo of tipos" >{{tipo.Descripcion}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+
+
+          <!--<div style="margin-bottom: 4px;">Tipo de Establecimiento: </div>
+           <section class="align-check">
+            <mat-checkbox >Todos</mat-checkbox>
+            <mat-checkbox *ngFor="let tipo of tipos" value="{{tipo.ID}}">{{tipo.Descripcion}}</mat-checkbox>
+          </section> -->
+
+          <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 4px;"><b>Tipo de Establecimiento:</b> </div>
+            <mat-grid-list class="align-check" cols="2" rowHeight="4:1">
+              <!-- <mat-grid-tile><mat-checkbox value="0">Todos</mat-checkbox></mat-grid-tile> -->
+              <mat-grid-tile *ngFor="let tipo of tipos">
+                <mat-checkbox value="{{tipo.ID}}" (change) ="changeSelectedTipo($event)" #input1 id="{{'check'+tipo.ID}}" >{{tipo.Descripcion}}</mat-checkbox>
+              </mat-grid-tile>
+            </mat-grid-list>
+            <!-- <button mat-raised-button >Seleccionar Todos</button> -->
+          </div>
+
+
+          <button mat-raised-button color="primary" (click)="cleanFilters()">Limpiar Filtros</button>
+        </div>
+
+        <p>Cantidad de Centros de Salud:
+          <b>{{cantCentrosDeSalud}}</b>
+        </p>
+
+        <!-- <p>Texto busqueda:
+          <b>{{textBusqueda}}</b>
+        </p> -->
+
+      </mat-card-content>
+    </mat-card>
+  </mat-drawer>
+
+  <!-- Main Contenten -->
+  <mat-drawer-content>
+
+    <!-- {{centrosDeSaludForView | json}} -->
+
+    <mat-card id="mapCard">
+      <div id="overlay" [style.display]="showOverlay?'block':'none'">
+        <div id="text">No se encontraron resultados</div>
+      </div>
+
+      <agm-map id="mapDiv" [fullscreenControl]="true" [mapTypeControl]="true" [mapTypeId]="'roadmap'" [latitude]="lat" [longitude]="lng"
+        [fitBounds]="fitBound" [maxZoom]="19" (mapReady)="mapReady($event)">
+        <agm-marker [iconUrl]="" [latitude]="+cs.Latitud" [longitude]="+cs.Longitud" [title]="cs.Nombre" [label]="showLabel===true?cs.Nombre:''"
+          *ngFor="let cs of centrosDeSaludForView">
+
+          <agm-snazzy-info-window [maxWidth]="400" [maxHeight]="350" [closeWhenOthersOpen]="true">
+            <ng-template>
+
+              <!-- Imagen del Centro de Salud -->
+              <div class="custom-img" [style.background-image]="cs.URLImagenDelCentroDeSalud === null?'url(./assets/img/Centro-Civico.jpg)' :'url('+ BaseUrlImgCS.concat(cs.URLImagenDelCentroDeSalud) +')'">
+              </div>
+
+              <section class="custom-content">
+                <h1 class="custom-header">
+                  {{cs.Nombre}}
+                  <small>{{cs.TipoEstablecimiento}} - {{cs.TipoNivelAtencion}}</small>
+                </h1>
+                <div class="custom-body">
+                  <h3>Informacion General</h3>
+                  <uL>
+                    <li>
+                      <b>ID: </b>{{cs.ID}}</li>
+                    <li>
+                      <b>Zona: </b>{{cs.Zona}}</li>
+                    <li>
+                      <b>Departamento: </b>{{cs.Departamento}}</li>
+                    <li>
+                      <b>Direccion: </b>{{cs.Direccion}}</li>
+                    <li>
+                      <b>Telefono: </b>{{cs.Telefono!=null?cs.Telefono:'*Sin datos*'}}</li>
+                  </uL>
+
+                  <br>
+
+                  <h3 *ngIf="cs.ProveedorConectividadPorCentroDeSalud.length>0">Proveedores de Conectividad</h3>
+                  <uL *ngFor="let prov of cs.ProveedorConectividadPorCentroDeSalud">
+                    <li>
+                      <b>Proveedor: </b>{{prov.Nombre}}
+                      <uL>
+                        <li>
+                          <b>Tipo Conexion Internet: </b>{{prov.TipoConexionInternet!=null?prov.TipoConexionInternet:'*Sin datos*'}}
+                        </li>
+                        <li>
+                          <b>Velocidad Bajada: </b>{{prov.VelocidadBajada}}
+                        </li>
+                        <li>
+                          <b>Velocidad Subida: </b>{{prov.VelocidadSubida}}
+                        </li>
+
+                      </uL>
+
+                    </li>
+
+                  </uL>
+
+                </div>
+              </section>
+
+            </ng-template>
+          </agm-snazzy-info-window>
+        </agm-marker>
+
+
+      </agm-map>
+    </mat-card>
+  </mat-drawer-content>
+</mat-drawer-container>
